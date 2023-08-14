@@ -1,6 +1,4 @@
 absl-py==1.0.0
-# Editable install with no version control (aegis-api==0.0.0)
--e /home/filipovicha/Documents/dClimate/AegApi/aegis-api-main
 affine==2.3.1
 aiobotocore==2.5.2
 aiohttp @ file:///tmp/build/80754af9/aiohttp_1646806365504/work
