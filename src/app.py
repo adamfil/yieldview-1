@@ -2,6 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+from dash import Dash, DiskcacheManager, CeleryManager, Input, Output, html, callback
 
 import pickle
 import requests
@@ -387,6 +388,18 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                 print(e)
                 return None
 
+if 'REDIS_URL' in os.environ:
+    # Use Redis & Celery if REDIS_URL set as an env variable
+    from celery import Celery
+    celery_app = Celery(__name__, broker=os.environ['REDIS_URL'], backend=os.environ['REDIS_URL'])
+    background_callback_manager = CeleryManager(celery_app)
+
+else:
+    # Diskcache for non-production apps when developing locally
+    import diskcache
+    cache = diskcache.Cache("./cache")
+    background_callback_manager = DiskcacheManager(cache)
+    
 # initialize the Dash app
 app = dash.Dash(__name__,title="csvtest", suppress_callback_exceptions=True)
 # Declare server for Heroku deployment. Needed for Procfile.
@@ -590,7 +603,9 @@ def update_figure(n_clicks, selected_commodity, year_range, comparison_year, yie
     [Input('update_button_peril', 'n_clicks')],
     [State('month', 'value'),
      State('year_range_slider2', 'value'),
-     State('comparison_year_slider2', 'value')]
+     State('comparison_year_slider2', 'value')],
+     background=True,
+     manager=background_callback_manager,
 )
 def update_peril_figure(n_clicks, month, year_range, comparison_year):
     if n_clicks is None:
