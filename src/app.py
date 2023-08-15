@@ -51,7 +51,7 @@ for _, row in counties2.iterrows():
 
 mydir = os.getcwd() # would be the MAIN folder
 mydir_tmp = mydir + "/datasets" 
-
+'''
 my_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjI1MzQwMjMwMDc5OSwiaWF0IjoxNjMwNTMwMTgwLCJzdWIiOiJhMDIzYjUwYi0wOGQ2LTQwY2QtODNiMS1iMTExZDA2Mzk1MmEifQ.qHy4B0GK22CkYOTO8gsxh0YzE8oLMMa6My8TvhwhxMk'
 
 my_url = 'https://api.dclimate.net/apiv4/rma-code-lookups/valid_states'
@@ -68,6 +68,14 @@ for key in state_codes.keys():
     print(r.text)
     county_codes = r.json()
     state_county[key] = county_codes
+'''
+# Load state codes
+with open('state_codes.json', 'r') as file:
+    state_codes = json.load(file)
+
+# Load state-county data
+with open('state_county.json', 'r') as file:
+    state_county = json.load(file)
 
 month_map = {
     1: 'January',
@@ -401,9 +409,20 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                     height=800,
     )
 
+                # Even if there's an error, try to delete the CSV
+                try:
+                    os.remove(os.path.join(output_folder, f"{method}_{commodity}_output.csv"))
+                except:
+                    pass
+
                 return fig 
             except Exception as e:
                 print(e)
+                # Even if there's an error, try to delete the CSV
+                try:
+                    os.remove(os.path.join(output_folder, f"{method}_{commodity}_output.csv"))
+                except:
+                    pass
                 return None
 
 # initialize the Dash app
