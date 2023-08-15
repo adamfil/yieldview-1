@@ -18,6 +18,7 @@ import pandas as pd
 from urllib.request import urlopen
 import json
 import os 
+import json
 
 with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
     counties = json.load(response)
@@ -63,6 +64,8 @@ head = {"Authorization": my_token}
 state_county = {}
 for key in state_codes.keys():
     r = requests.get(my_url + str(key), headers=head)
+    print(key)
+    print(r.text)
     county_codes = r.json()
     state_county[key] = county_codes
 
@@ -154,6 +157,7 @@ def calculate_difference(val, start_year, end_year, month, comparison_year):
     return difference
 
 def return_peril_figures(month, start_year, end_year, comparison_year):
+    '''
     # Initialize the master dictionary
     master = {}
 
@@ -179,6 +183,20 @@ def return_peril_figures(month, start_year, end_year, comparison_year):
             prop_master[county_code] = master[f"dataset_{list(county_polygons.keys()).index(county_code)}"]
 
     # 1. Extract the most recent value from each array
+    recent_values = {key: calculate_difference(val, start_year, end_year, month, comparison_year) for key, val in prop_master.items()}
+    '''
+
+    # Load data from the JSON file
+    with open(mydir_tmp + '/combined_data.json', 'r') as f:
+        master = json.load(f)
+
+    prop_master = {}
+    for county_code in list(county_polygons.keys()):
+        dataset_key = f"dataset_{list(county_polygons.keys()).index(county_code)}"
+        if dataset_key in master:
+            prop_master[county_code] = master[dataset_key]
+
+    # Extract the most recent value from each array
     recent_values = {key: calculate_difference(val, start_year, end_year, month, comparison_year) for key, val in prop_master.items()}
 
     # 2. Create a dataframe
