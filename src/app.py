@@ -226,6 +226,7 @@ def return_peril_figures(month, start_year, end_year, comparison_year):
         ]
     except Exception as e:
         print(e)
+        print(4)
         # Create a custom color scale
         colorscale = [
             [0, "red"],
@@ -281,10 +282,11 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
     for commodity in commodities:
         yield_diff = {}
         yield_percent = {}
+        tempo = master[commodity]
         for state in state_county.keys():
             for county in state_county[state].keys():
                 try:
-                    df = master[commodity][state][county]
+                    df = tempo[state][county]
 
                     # Filter to Irrigation Practice Code = 2
                     df_filtered = df[df['Irrigation Practice Code'] == 2]
@@ -296,7 +298,9 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                     # Subtract this average from the 2022 Yield Amount
                     df_2022 = df_filtered[df_filtered['Yield Year'] == comparison_year]
                     print(df_2022[yield_type])
+                    print(5)
                     print(average_yield)
+                    print(6)
                     difference = df_2022[yield_type] - average_yield
                     
                     # Calculate the percentage difference
@@ -307,6 +311,7 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
 
                 except Exception as e:
                     print(e)
+                    print(7)
                     pass
                 
         for key in yield_diff.keys():
@@ -316,8 +321,12 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                 
                 temp_percent = yield_percent[key][(yield_percent[key].index[0])]
                 yield_percent[key] = temp_percent
+                print(88)
+                print(key)
             except Exception as e:
+                print(8)
                 print(e)
+                print(key)
                 yield_diff[key] = None
                 yield_percent[key] = None
             
