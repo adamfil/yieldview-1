@@ -35,6 +35,11 @@ with open('commodity_uom.pkl', 'rb') as f:
 
 import geopandas as gpd
 
+# Diskcache for non-production apps when developing locally
+import diskcache
+cache = diskcache.Cache("./cache")
+background_callback_manager = DiskcacheManager(cache)
+
 # Load the 'naturalearth_lowres' dataset that's bundled with Geopandas
 world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
 
@@ -611,7 +616,9 @@ def render_content(tab):
      State('year_range_slider', 'value'),
      State('comparison_year_slider', 'value'),
      State('yield_type', 'value'),
-     State('result_type', 'value')]
+     State('result_type', 'value')],
+    background=True,
+    manager=background_callback_manager,
 )
 def update_figure(n_clicks, selected_commodity, year_range, comparison_year, yield_type, result_type):
     # if the button has not been clicked, there is no need to update the figure
