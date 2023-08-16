@@ -302,10 +302,6 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
 
                     # Subtract this average from the 2022 Yield Amount
                     df_2022 = df_filtered[df_filtered['Yield Year'] == comparison_year]
-                    print(df_2022[yield_type])
-                    print(5)
-                    print(average_yield)
-                    print(6)
                     difference = df_2022[yield_type] - average_yield
                     
                     # Calculate the percentage difference
@@ -315,8 +311,6 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                     yield_percent[f"{state}{county}"] = percent_diff
 
                 except Exception as e:
-                    print(e)
-                    print(7)
                     pass
                 
         for key in yield_diff.keys():
@@ -326,12 +320,7 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                 
                 temp_percent = yield_percent[key][(yield_percent[key].index[0])]
                 yield_percent[key] = temp_percent
-                print(88)
-                print(key)
             except Exception as e:
-                print(8)
-                print(e)
-                print(key)
                 yield_diff[key] = None
                 yield_percent[key] = None
             
