@@ -19,6 +19,7 @@ from urllib.request import urlopen
 import json
 import os 
 import json
+import gc 
 
 with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
     counties = json.load(response)
@@ -268,7 +269,6 @@ def return_peril_figures(month, start_year, end_year, comparison_year):
     return fig
 
 
-
 def return_figures(selected_commodity, start_year, end_year, comparison_year, yield_type, result_type):
     master_diff = {}
     master_percent = {}
@@ -287,11 +287,10 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
     for commodity in commodities:
         yield_diff = {}
         yield_percent = {}
-        tempo = master[commodity]
         for state in state_county.keys():
             for county in state_county[state].keys():
                 try:
-                    df = tempo[state][county]
+                    df = master[commodity][state][county]
 
                     # Filter to Irrigation Practice Code = 2
                     df_filtered = df[df['Irrigation Practice Code'] == 2]
@@ -302,6 +301,8 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
 
                     # Subtract this average from the 2022 Yield Amount
                     df_2022 = df_filtered[df_filtered['Yield Year'] == comparison_year]
+                    print(df_2022[yield_type])
+                    print(average_yield)
                     difference = df_2022[yield_type] - average_yield
                     
                     # Calculate the percentage difference
@@ -311,6 +312,7 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                     yield_percent[f"{state}{county}"] = percent_diff
 
                 except Exception as e:
+                    print(e)
                     pass
                 
         for key in yield_diff.keys():
@@ -321,6 +323,7 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                 temp_percent = yield_percent[key][(yield_percent[key].index[0])]
                 yield_percent[key] = temp_percent
             except Exception as e:
+                print(e)
                 yield_diff[key] = None
                 yield_percent[key] = None
             
@@ -412,20 +415,9 @@ def return_figures(selected_commodity, start_year, end_year, comparison_year, yi
                     height=800,
     )
 
-                # Even if there's an error, try to delete the CSV
-                try:
-                    os.remove(os.path.join(output_folder, f"{method}_{commodity}_output.csv"))
-                except:
-                    pass
-
                 return fig 
             except Exception as e:
                 print(e)
-                # Even if there's an error, try to delete the CSV
-                try:
-                    os.remove(os.path.join(output_folder, f"{method}_{commodity}_output.csv"))
-                except:
-                    pass
                 return None
 
 # initialize the Dash app
